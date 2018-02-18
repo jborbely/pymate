@@ -153,7 +153,7 @@ class Rule(object):
         firstCapture = captureIndices[0]
         endPatternMatch = self.endPattern == scanner.patterns[index]
         nextTags = scanner.handleMatch(result, ruleStack, line, self, endPatternMatch)
-        if nextTags:
+        if nextTags is not None:
             return {
                 'nextTags': nextTags,
                 'tagsStart': firstCapture['start'],

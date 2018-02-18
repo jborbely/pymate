@@ -127,16 +127,18 @@ class Pattern(object):
         for index in beginCaptureIndices:
             beginCaptures.append(line[index['start']:index['end']])
 
-        #resolvedMatch = self.match.replace(AllDigitsRegex, (match) ->
-        #    index = parseInt(match[1..])
-        #    if beginCaptures[index]:
-        #        _.escapeRegExp(beginCaptures[index])
-        #    else
-        #        "\\#{index}"
+        match_iter = AllDigitsRegex.globalMatch(self.match)
+        while match_iter.hasNext():
+            result = match_iter.next().captured()
+            index = int(result[1:])
+            if beginCaptures[index]:
+                val = QtCore.QRegularExpression.escape(beginCaptures[index])
+            else:
+                val = r"\\" + str(index)
+            self.match = self.match.replace(result, val)
 
-        print(resolvedMatch)
-
-        self.grammar.createPattern({
+        resolvedMatch = self.match
+        return self.grammar.createPattern(**{
             'hasBackReferences': False,
             'match': resolvedMatch,
             'captures': self.captures,

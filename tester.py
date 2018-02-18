@@ -5,14 +5,14 @@ registry = GrammarRegistry()
 
 grammar = registry.loadGrammarSync('MagicPython.cson')
 
-filename = 'builtins3'
+filename = 'builtins5'
 
 source = None
 with codecs.open(r'D:\code\git\MagicPython\test\atom-spec\python-spec.js', encoding='utf-8') as fp:
     for line in fp:
         if filename in line:
             fp.readline()
-            source = fp.readline().split('tokenizeLines("')[1][:-3].replace('\\n', '\n')
+            source = str(fp.readline().split('tokenizeLines("')[1][:-3]).replace(r'\\\n', 'XX').replace('\\n', '\n').replace('XX', '\\\n')
             break
 
 results = []

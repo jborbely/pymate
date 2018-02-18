@@ -101,6 +101,7 @@ class Grammar(object):
         initialRuleStackLength = len(ruleStack)
         position = 0
         tokenCount = 0
+        popStack = None
 
         while True:
             previousRuleStackLength = len(ruleStack)
@@ -164,13 +165,13 @@ class Grammar(object):
                         popStack = True
 
                     # Rule with same scope name as previous rule was pushed but position wasn't advanced
-                    if lastRule and lastRule['scopeName'] and penultimateRule['scopeName'] == lastRule['scopeName']:
+                    if lastRule and lastRule.scopeName and penultimateRule.scopeName == lastRule.scopeName:
                         popStack = True
 
                     if popStack:
                         ruleStack.pop()
                         lastSymbol = tags[-1]
-                        if lastSymbol < 0 and lastSymbol is self.startIdForScope(lastRule['scopeName']):
+                        if lastSymbol < 0 and lastSymbol is self.startIdForScope(lastRule.scopeName):
                             tags.pop()  # also pop the duplicated start scope if it was pushed
                         tags.append(len(line) - position)
                         break
