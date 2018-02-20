@@ -1,5 +1,5 @@
 #from .scope_selector_parser import parse
-import pypeg2
+#import pypeg2
 
 
 class ScopeSelector(object):
