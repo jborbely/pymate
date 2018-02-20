@@ -1,4 +1,5 @@
-from .scope_selector_parser import parse
+#from .scope_selector_parser import parse
+import pypeg2
 
 
 class ScopeSelector(object):
@@ -7,7 +8,7 @@ class ScopeSelector(object):
         # Create a new scope selector.
         #
         # source - A {String} to parse as a scope selector.
-        self.matcher = parse(source)
+        self.matcher = pypeg2.parse("this=something", pypeg2.RegEx)
 
     def matches(self, scopes):
         # Check if this scope selector matches the scopes.
