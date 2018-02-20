@@ -1,10 +1,7 @@
-from PyQt5 import QtCore
-
-
 class OnigScanner(object):
 
     def __init__(self, patterns):
-        self.patterns = [QtCore.QRegularExpression(pattern) for pattern in patterns]
+        self.patterns = patterns
 
     def findNextMatchSync(self, line, position):
         bestLocation = 0

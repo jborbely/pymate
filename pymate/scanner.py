@@ -1,3 +1,4 @@
+from PyQt5 import QtCore
 from .onig_scanner import OnigScanner
 
 
@@ -32,7 +33,8 @@ class Scanner(object):
 
     def createScanner(self, firstLine, position, anchorPosition):
         # Create a new {OnigScanner} with the given options.
-        patterns = [pattern.getRegex(firstLine, position, anchorPosition) for pattern in self.patterns]
+        patterns = [QtCore.QRegularExpression(pattern.getRegex(firstLine, position, anchorPosition))
+                    for pattern in self.patterns]
         scanner = OnigScanner(patterns)
         return scanner
 

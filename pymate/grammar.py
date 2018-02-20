@@ -70,8 +70,10 @@ class Grammar(object):
             truncatedLine = True
         else:
             line = inputLine
-            string = inputLine  # OnigString
-            stringWithNewLine = inputLine + '\n' if appendNewLine else string  # OnigString
+
+        openScopeTags = []
+        string = line  # OnigString
+        stringWithNewLine = line + '\n' if appendNewLine else line  # OnigString
 
         if ruleStack:
             ruleStack = ruleStack[:]

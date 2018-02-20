@@ -101,24 +101,23 @@ class Pattern(object):
             if escape:
                 if character == 'A':
                     if firstLine:
-                        escaped.append("\\#{character}")
+                        escaped.append('\\' + character)
                     else:
                         escaped.append(placeholder)
                 elif character == 'G':
-                    if offset is anchor:
-                        escaped.append("\\#{character}")
+                    if offset == anchor:
+                        escaped.append('\\' + character)
                     else:
                         escaped.append(placeholder)
                 elif character == 'z':
                     escaped.append('$(?!\n)(?<!\n)')
                 else:
-                    escaped.append("\\#{character}")
+                    escaped.append('\\' + character)
                 escape = False
             elif character == '\\':
                 escape = True
             else:
                 escaped.append(character)
-
         return ''.join(escaped)
 
     def resolveBackReferences(self, line, beginCaptureIndices):
@@ -127,6 +126,7 @@ class Pattern(object):
         for index in beginCaptureIndices:
             beginCaptures.append(line[index['start']:index['end']])
 
+        resolvedMatch = self.match
         match_iter = AllDigitsRegex.globalMatch(self.match)
         while match_iter.hasNext():
             result = match_iter.next().captured()
@@ -134,10 +134,9 @@ class Pattern(object):
             if beginCaptures[index]:
                 val = QtCore.QRegularExpression.escape(beginCaptures[index])
             else:
-                val = r"\\" + str(index)
-            self.match = self.match.replace(result, val)
+                val = "\\" + str(index)
+            resolvedMatch = resolvedMatch.replace(result, val)
 
-        resolvedMatch = self.match
         return self.grammar.createPattern(**{
             'hasBackReferences': False,
             'match': resolvedMatch,
@@ -181,7 +180,10 @@ class Pattern(object):
             return [self]
 
     def resolveScopeName(self, scopeName, line, captureIndices):
-        # TODO
+        resolvedScopeName = scopeName
+        match_iter = AllCustomCaptureIndicesRegex.globalMatch(scopeName)
+        while match_iter.hasNext():
+            raise NotImplementedError
         # return resolvedScopeName = scopeName.replace(AllCustomCaptureIndicesRegex, function(match, index, commandIndex, command) {
         #     var capture, replacement;
         #     capture = captureIndices[parseInt(index != null ? index : commandIndex)];
@@ -203,17 +205,17 @@ class Pattern(object):
         #     }
         #   });
         # };
-        return scopeName
+        return resolvedScopeName
 
     def handleMatch(self, stack, line, captureIndices, rule, endPatternMatch):
         tags = []
         scopeName = None
 
-        zeroWidthMatch = captureIndices[0]['start'] is captureIndices[0]['end']
+        zeroWidthMatch = captureIndices[0]['start'] == captureIndices[0]['end']
 
         if self.popRule:
-          # Pushing and popping a rule based on zero width matches at the same index
-          # leads to an infinite loop. We bail on parsing if we detect that case here.
+            # Pushing and popping a rule based on zero width matches at the same index
+            # leads to an infinite loop. We bail on parsing if we detect that case here.
             if zeroWidthMatch and stack[-1].get('zeroWidthMatch') and \
                     stack[-1]['rule'].anchorPosition == captureIndices[0]['end']:
                 return False
@@ -238,8 +240,8 @@ class Pattern(object):
             ruleToPush.anchorPosition = captureIndices[0]['end']
             contentScopeName = ruleToPush.contentScopeName
             if contentScopeName:
-              contentScopeName = self.resolveScopeName(contentScopeName, line, captureIndices)
-              tags.append(self.grammar.startIdForScope(contentScopeName))
+                contentScopeName = self.resolveScopeName(contentScopeName, line, captureIndices)
+                tags.append(self.grammar.startIdForScope(contentScopeName))
             stack.append({
                 'rule': ruleToPush,
                 'scopeName': scopeName,
@@ -287,7 +289,7 @@ class Pattern(object):
 
         tags = []
         scope = self.captures.get(str(parentCapture['index']))
-        if scope and scope['name']:
+        if scope and scope.get('name'):
             parentCaptureScope = self.resolveScopeName(scope['name'], line, allCaptureIndices)
             tags.append(self.grammar.startIdForScope(parentCaptureScope))
 
