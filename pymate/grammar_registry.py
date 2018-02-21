@@ -1,3 +1,5 @@
+import plistlib
+
 import cson
 
 from . import Infinity
@@ -81,13 +83,21 @@ class GrammarRegistry(object):
       return grammar
 
     def readGrammarSync(self, grammarPath):
-        with open(grammarPath, 'r') as fp:
-            grammar = cson.load(fp)
+        grammar = None
+        with open(grammarPath, 'rb') as fp:
+            if grammarPath.endswith('.cson'):
+                print('loaded ' + grammarPath + ' using cson')
+                grammar = cson.load(fp)
+            elif grammarPath.endswith('.tmLanguage'):
+                print('loaded ' + grammarPath + ' using plistlib')
+                grammar = plistlib.load(fp)
+            else:
+                raise ValueError('Cannot read ' + grammarPath)
 
         if isinstance(grammar['scopeName'], str) and grammar['scopeName']:
             return self.createGrammar(grammarPath, **grammar)
         else:
-          raise ValueError("Grammar missing required scopeName property: #{grammarPath}")
+          raise ValueError('Grammar missing required scopeName property: ' + grammarPath)
 
     def loadGrammarSync(self, grammarPath):
         grammar = self.readGrammarSync(grammarPath)

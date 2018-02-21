@@ -1,4 +1,5 @@
 import os
+import time
 import codecs
 from pymate import GrammarRegistry
 
@@ -23,8 +24,8 @@ for root, _, files in os.walk(root_path):
         paths.append(os.path.join(root, file))
 
 registry = GrammarRegistry()
-grammar_py = registry.loadGrammarSync('MagicPython.cson')
-grammar_rx = registry.loadGrammarSync('MagicRegExp.cson')
+grammar_py = registry.loadGrammarSync('MagicPython.tmLanguage')
+grammar_rx = registry.loadGrammarSync('MagicRegExp.tmLanguage')
 
 
 def normalize_scopes(scopes):
@@ -103,15 +104,20 @@ for path in paths:
     k = 0
     for token in tokens:
         for item in token:
-            #print('{:25s} : {}'.format(item['value'].strip(), ', '.join(item['scopes'])))
-            if item['value'].strip() != results[k]['value'].strip():
-                raise ValueError(item['value'].strip() + ' IS NOT EQUAL TO ' + results[k]['value'].strip())
-            scopes = normalize_scopes(set(item['scopes']))  # use a set to remove an scopes that are repeated
-            if len(scopes) != len(results[k]['scopes']):
-                raise ValueError('\n' + ' '.join(sorted(scopes)) + '\nDOES NOT HAVE THE SAME LENGTH AS\n' + ' '.join(sorted(results[k]['scopes'])))
+            # print('{:25s} : {}'.format(item['value'].strip(), ', '.join(item['scopes'])))
+            assert item['value'].strip() == results[k]['value'].strip(), \
+                item['value'].strip() + ' IS NOT EQUAL TO ' + results[k]['value'].strip()
+
+            # use a set to remove an scopes that are repeated
+            scopes = normalize_scopes(set(item['scopes']))
+            assert len(scopes) == len(results[k]['scopes']), \
+                '\n' + ' '.join(sorted(scopes)) + \
+                '\nDOES NOT HAVE THE SAME LENGTH AS\n' + \
+                ' '.join(sorted(results[k]['scopes']))
+
             for scope in results[k]['scopes']:
-                if scope not in scopes:
-                    raise ValueError(scope + ' IS NOT IN ' + ' '.join(scopes))
+                assert scope in scopes, scope + ' IS NOT IN ' + ' '.join(scopes)
+
             k += 1
 
 

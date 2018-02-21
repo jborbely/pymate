@@ -1,3 +1,8 @@
+"""
+first-mate: 7.1.0 (commit 4216f7d)
+MagicPython: 1.0.12
+"""
+
 import sys
 
 Infinity = sys.maxsize
